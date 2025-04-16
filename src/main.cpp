@@ -57,7 +57,7 @@ void validateOrResetSettings()
 const char *ssid = "solar_track";
 const char *password = "admin70503";
 
-const int RELAY_EAST = 12;
+const int RELAY_EAST = 26;
 const int RELAY_WEST = 14;
 const int SENSOR_EAST = 22;
 const int SENSOR_WEST = 23;
@@ -87,8 +87,8 @@ void setupWiFi()
 // ----------------------- Motor Control Functions -----------------------
 void stopMotor()
 {
-  digitalWrite(RELAY_EAST, LOW);
-  digitalWrite(RELAY_WEST, LOW);
+  digitalWrite(RELAY_EAST, HIGH); // Set to HIGH to deactivate
+  digitalWrite(RELAY_WEST, HIGH); // Set to HIGH to deactivate
   isMovingEast = false;
   isMovingWest = false;
   Serial.println("Motor stopped.");
@@ -108,8 +108,8 @@ void moveEast()
   }
 
   Serial.println("Moving East");
-  digitalWrite(RELAY_EAST, HIGH);
-  digitalWrite(RELAY_WEST, LOW);
+  digitalWrite(RELAY_EAST, LOW);  // Set to LOW to activate
+  digitalWrite(RELAY_WEST, HIGH); // Set to HIGH to deactivate
   isMovingEast = true;
   isMovingWest = false;
 }
@@ -128,8 +128,8 @@ void moveWest()
   }
 
   Serial.println("Moving West");
-  digitalWrite(RELAY_WEST, HIGH);
-  digitalWrite(RELAY_EAST, LOW);
+  digitalWrite(RELAY_WEST, LOW);  // Set to LOW to activate
+  digitalWrite(RELAY_EAST, HIGH); // Set to HIGH to deactivate
   isMovingWest = true;
   isMovingEast = false;
 }
@@ -314,16 +314,21 @@ void setup()
 {
   Serial.begin(115200);
 
+  delay(5000); // Wait 5 second for power stabilization
+
   EEPROM.begin(EEPROM_SIZE);
   loadSettingsFromEEPROM();
   validateOrResetSettings();
 
   pinMode(RELAY_EAST, OUTPUT);
   pinMode(RELAY_WEST, OUTPUT);
+
+  // Explicitly set relays to inactive state before enabling them
+  digitalWrite(RELAY_EAST, HIGH); // Ensure RELAY_EAST is inactive
+  digitalWrite(RELAY_WEST, HIGH); // Ensure RELAY_WEST is inactive
+
   pinMode(SENSOR_EAST, INPUT_PULLDOWN);
   pinMode(SENSOR_WEST, INPUT_PULLDOWN);
-  digitalWrite(RELAY_EAST, LOW);
-  digitalWrite(RELAY_WEST, LOW);
 
   setupWiFi();
   Rtc.Begin();
